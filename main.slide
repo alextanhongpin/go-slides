@@ -142,3 +142,4 @@ JSON Dump:
 - how to handle non-deterministic fields
   - id generation
   - timestamp
+  - random number
