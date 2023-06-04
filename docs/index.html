@@ -314,7 +314,8 @@ Connection: close
       <article >
       
         <h3>Echo Handler - Test Output</h3>
-        
+        <p><code>testdata/TestEchoHandler.http</code>:</p>
+
   <div class="code" >
 <pre><span num="1">POST /echo HTTP/1.1</span>
 <span num="2">Host: example.com</span>
@@ -346,7 +347,7 @@ Connection: close
   
       <article >
       
-        <h3>Echo Handler - Diff</h3>
+        <h3>Echo Handler - Code Changes</h3>
         <p>What happens if we change the message from <code>hello world</code> to <code>hello, go</code>?</p>
 <pre><code class="language-diff">func TestEchoHandler(t *testing.T) {
     b := []byte(`{
@@ -357,7 +358,17 @@ Connection: close
     ...
 }
 </code></pre>
-<p>We will see the diff:</p>
+
+      
+      <span class="pagenumber">16</span>
+      </article>
+  
+  
+  
+      <article >
+      
+        <h3>Echo Handler - Diff Output</h3>
+        <p>We will see the diff:</p>
 <pre><code class="language-bash">=== RUN   TestEchoHandler
     httpdump.go:94: Request does not match snapshot.
           Snapshot(-)
@@ -375,7 +386,7 @@ FAIL    github.com/alextanhongpin/go-slides/asset/snippets      0.414s
 </code></pre>
 
       
-      <span class="pagenumber">16</span>
+      <span class="pagenumber">17</span>
       </article>
   
   
@@ -405,7 +416,7 @@ FAIL    github.com/alextanhongpin/go-slides/asset/snippets      0.414s
 </ul>
 
       
-      <span class="pagenumber">17</span>
+      <span class="pagenumber">18</span>
       </article>
   
   

@@ -150,9 +150,11 @@ JSON Dump:
 
 ## Echo Handler - Test Output
 
+`testdata/TestEchoHandler.http`:
+
 .code asset/snippets/testdata/TestEchoHandler.http
 
-## Echo Handler - Diff
+## Echo Handler - Code Changes
 
 What happens if we change the message from `hello world` to `hello, go`?
 
@@ -166,6 +168,8 @@ func TestEchoHandler(t *testing.T) {
     ...
 }
 ```
+
+## Echo Handler - Diff Output
 
 We will see the diff:
 
