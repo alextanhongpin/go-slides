@@ -249,19 +249,163 @@ Connection: close
   
       <article >
       
+        <h2>Basic Example</h2>
+      
+      <span class="pagenumber">12</span>
+      </article>
+  
+  
+  
+      <article >
+      
+        <h3>Echo Handler</h3>
+        
+  <div class="code" >
+<pre><span num="13">type EchoRequest struct {</span>
+<span num="14">    Message string `json:&#34;message&#34;`</span>
+<span num="15">}</span>
+</pre>
+</div>
+
+  <div class="code" >
+<pre><span num="17">func echoHandler(w http.ResponseWriter, r *http.Request) {</span>
+<span num="18">    var req EchoRequest</span>
+<span num="19">    if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil {</span>
+<span num="20">        http.Error(w, err.Error(), http.StatusBadRequest)</span>
+<span num="21">        return</span>
+<span num="22">    }</span>
+<span num="23"></span>
+<span num="24">    if err := json.NewEncoder(w).Encode(req); err != nil {</span>
+<span num="25">        http.Error(w, err.Error(), http.StatusInternalServerError)</span>
+<span num="26">        return</span>
+<span num="27">    }</span>
+<span num="28">}</span>
+</pre>
+</div>
+
+      
+      <span class="pagenumber">13</span>
+      </article>
+  
+  
+  
+      <article >
+      
+        <h3>Echo Handler - Test</h3>
+        
+  <div class="code" >
+<pre><span num="30">func TestEchoHandler(t *testing.T) {</span>
+<span num="31">    b := []byte(`{</span>
+<span num="32">        &#34;message&#34;: &#34;hello world&#34;</span>
+<span num="33">    }`)</span>
+<span num="34">    r := httptest.NewRequest(&#34;POST&#34;, &#34;/echo&#34;, bytes.NewReader(b))</span>
+<span num="35"></span>
+<span num="36">    testutil.DumpHTTP(t, r, echoHandler)</span>
+<span num="37">}</span>
+</pre>
+</div>
+
+      
+      <span class="pagenumber">14</span>
+      </article>
+  
+  
+  
+      <article >
+      
+        <h3>Echo Handler - Test Output</h3>
+        
+  <div class="code" >
+<pre><span num="1">POST /echo HTTP/1.1</span>
+<span num="2">Host: example.com</span>
+<span num="3">User-Agent: Go-http-client/1.1</span>
+<span num="4">Content-Length: 29</span>
+<span num="5">Accept-Encoding: gzip</span>
+<span num="6"></span>
+<span num="7">{</span>
+<span num="8"> &#34;message&#34;: &#34;hello world&#34;</span>
+<span num="9">}</span>
+<span num="10"></span>
+<span num="11">---</span>
+<span num="12"></span>
+<span num="13">HTTP/1.1 200 OK</span>
+<span num="14">Connection: close</span>
+<span num="15">Content-Type: text/plain; charset=utf-8</span>
+<span num="16"></span>
+<span num="17">{</span>
+<span num="18"> &#34;message&#34;: &#34;hello world&#34;</span>
+<span num="19">}</span>
+</pre>
+</div>
+
+      
+      <span class="pagenumber">15</span>
+      </article>
+  
+  
+  
+      <article >
+      
+        <h3>Echo Handler - Diff</h3>
+        <p>What happens if we change the message from <code>hello world</code> to <code>hello, go</code>?</p>
+<pre><code class="language-diff">func TestEchoHandler(t *testing.T) {
+    b := []byte(`{
+-        &quot;message&quot;: &quot;hello world&quot;
++        &quot;message&quot;: &quot;hello, go&quot;
+    }`)
+    r := httptest.NewRequest(&quot;POST&quot;, &quot;/echo&quot;, bytes.NewReader(b))
+    ...
+}
+</code></pre>
+<p>We will see the diff:</p>
+<pre><code class="language-bash">=== RUN   TestEchoHandler
+    httpdump.go:94: Request does not match snapshot.
+          Snapshot(-)
+          Received(+):
+
+          map[string]any{
+        -       &quot;message&quot;: string(&quot;hello world&quot;),
+        +       &quot;message&quot;: string(&quot;hello, go&quot;),
+          }
+
+--- FAIL: TestEchoHandler (0.00s)
+FAIL
+exit status 1
+FAIL    github.com/alextanhongpin/go-slides/asset/snippets      0.414s
+</code></pre>
+
+      
+      <span class="pagenumber">16</span>
+      </article>
+  
+  
+  
+      <article >
+      
         <h3>Advanced</h3>
         <ul>
-<li>how to handle non-deterministic fields
+<li>
+<p>how to handle non-deterministic fields</p>
 <ul>
 <li>id generation</li>
 <li>timestamp</li>
 <li>random number</li>
 </ul>
 </li>
+<li>
+<p>middleware</p>
+<ul>
+<li>injecting context</li>
+<li>decorating handler</li>
+</ul>
+</li>
+<li>
+<p>dependencies</p>
+</li>
 </ul>
 
       
-      <span class="pagenumber">12</span>
+      <span class="pagenumber">17</span>
       </article>
   
   

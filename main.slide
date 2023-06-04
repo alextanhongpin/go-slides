@@ -136,6 +136,55 @@ JSON Dump:
           }
 ```
 
+## Basic Example
+
+## Echo Handler
+
+.code asset/snippets/httpdump_basic_test.go /^type Echo/,/\}/
+
+.code asset/snippets/httpdump_basic_test.go /^func echo/,/^\}/
+
+## Echo Handler - Test
+
+.code asset/snippets/httpdump_basic_test.go /^func TestEchoHandler/,/^\}/
+
+## Echo Handler - Test Output
+
+.code asset/snippets/testdata/TestEchoHandler.http
+
+## Echo Handler - Diff
+
+What happens if we change the message from `hello world` to `hello, go`?
+
+```diff
+func TestEchoHandler(t *testing.T) {
+    b := []byte(`{
+-        "message": "hello world"
++        "message": "hello, go"
+    }`)
+    r := httptest.NewRequest("POST", "/echo", bytes.NewReader(b))
+    ...
+}
+```
+
+We will see the diff:
+
+```bash
+=== RUN   TestEchoHandler
+    httpdump.go:94: Request does not match snapshot.
+          Snapshot(-)
+          Received(+):
+
+          map[string]any{
+        -       "message": string("hello world"),
+        +       "message": string("hello, go"),
+          }
+
+--- FAIL: TestEchoHandler (0.00s)
+FAIL
+exit status 1
+FAIL    github.com/alextanhongpin/go-slides/asset/snippets      0.414s
+```
 
 ## Advanced
 
@@ -143,3 +192,9 @@ JSON Dump:
   - id generation
   - timestamp
   - random number
+
+- middleware
+  - injecting context
+  - decorating handler
+
+- dependencies

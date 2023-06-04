@@ -8,6 +8,7 @@ install:
 
 
 present:
+	open http://localhost:3999
 	go run golang.org/x/tools/cmd/present
 
 
