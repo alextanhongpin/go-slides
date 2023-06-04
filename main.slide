@@ -1,0 +1,144 @@
+# HTTP Snapshot Testing
+Testing made simple with snapshot
+4 Jun 2023
+Tags: go, httptest, handler
+Summary: how to perform snapshot testing with go
+
+
+Alex Tan Hong Pin
+Sofware Engineer
+alextan220990@gmail.com
+https://alextanhongpin.github.io/
+
+
+## Agenda
+
+- Goal and Motivation
+- Key concepts of Snapshot Testing
+	- What is Snapshot Testing?
+	- How does Snapshot Testing works?
+- Dump Format
+	- Dot HTTP
+	- JSON
+- Basic Example
+- Advanced Example
+
+
+## Goal and Motivation
+
+To write simple and maintainable tests that also serves as documentation
+
+
+## Key Concepts of Snapshot Testing
+
+## What is Snapshot Testing?
+
+Snapshot testing is a type of testing that compares the current output of a component or application to a known good output.
+- Snapshot tests are typically used for UI testing, but can also be used for other types of testing.
+- Snapshot tests are easy to write and maintain, and can help to prevent regressions in your code.
+- Snapshot tests are not a replacement for unit or functional tests, but can be used in conjunction with them to provide a comprehensive testing suite.
+
+
+## How does Snapshot Testing works?
+
+- Snapshot tests are typically written using a special syntax that allows you to capture the output of a component or application.
+- The captured output is then stored in a file, which is compared to the output of the component or application during each test run.
+- If the output of the component or application changes, the snapshot test will fail.
+- This helps to ensure that the output of your component or application does not change unexpectedly, which can help to prevent regressions.
+
+## Dump Format
+
+
+To come up with a dump format, we need to fulfil the following criteria
+
+- human-readable
+- can be easily compared
+
+
+Proposed format:
+- `.http` (dot HTTP)
+- `.json`
+
+
+## Dot HTTP Format
+
+```http
+POST /register HTTP/1.1
+Host: example.com
+User-Agent: Go-http-client/1.1
+Content-Length: 58
+Content-Type: application/json;charset=utf-8
+Accept-Encoding: gzip
+
+{
+ "email": "john.doe@mail.com",
+ "password": "p@$$w0rd"
+}
+
+---
+
+HTTP/1.1 201 Created
+Connection: close
+
+{
+ "data": {
+  "accessToken": "@cc3$$T0k3n"
+ }
+}
+```
+
+## JSON Format
+
+JSON Dump:
+
+```json
+{
+ "name": "John Appleseed",
+ "age": 13,
+ "isMarried": true,
+ "bornAt": "2023-06-04T14:11:16.19331+08:00"
+}
+```
+
+
+## Diff HTTP
+
+```diff
+=== RUN   TestHTTPDump/post_json
+    httpdump.go:63: Request does not match snapshot.
+          Snapshot(-)
+          Received(+):
+
+          map[string]any{
+                "email":    string("john.doe@mail.com"),
+        +       "name":     string("John Doe"),
+        -       "password": string("p@$$w0rd"),
+        +       "password": string("p@$$w0rd123"),
+          }
+```
+
+
+## Diff JSON
+
+```diff
+=== RUN   TestDumpJSON
+    jsondump_test.go:27:
+          Snapshot(-)
+          Received(+):
+
+          map[string]any{
+        -       "age": float64(13),
+        +       "age": float64(18),
+                ... // 1 ignored entry
+        +       "hobbies":   []any{string("surfing")},
+                "isMarried": bool(true),
+                "name":      string("John Appleseed"),
+          }
+```
+
+
+## Advanced
+
+- how to handle non-deterministic fields
+  - id generation
+  - timestamp
