@@ -18,8 +18,6 @@ https://alextanhongpin.github.io/
 	- What is Snapshot Testing?
 	- How does Snapshot Testing works?
 - Dump Format
-	- Dot HTTP
-	- JSON
 - Basic Example
 - Advanced Example
 
@@ -53,88 +51,44 @@ To come up with a dump format, we need to fulfil the following criteria
 
 - human-readable
 - diff-friendly
+- interpretable
 
 
 Proposed format:
-- `.http` (dot HTTP)
-- `.json`
+- `json` for structs (with public fields)
+- `.http` (dot HTTP) for request/response
 
-
-## Dot HTTP Format
-
-```http
-POST /register HTTP/1.1
-Host: example.com
-User-Agent: Go-http-client/1.1
-Content-Length: 58
-Content-Type: application/json;charset=utf-8
-Accept-Encoding: gzip
-
-{
- "email": "john.doe@mail.com",
- "password": "p@$$w0rd"
-}
-
----
-
-HTTP/1.1 201 Created
-Connection: close
-
-{
- "data": {
-  "accessToken": "@cc3$$T0k3n"
- }
-}
-```
 
 ## JSON Format
 
 JSON Dump:
 
-```json
-{
- "name": "John Appleseed",
- "age": 13,
- "isMarried": true,
- "bornAt": "2023-06-04T14:11:16.19331+08:00"
-}
-```
+.code asset/snippets/jsondump.json
+
+Useful for inspecting body, but does not provide much context.
 
 
-## Diff HTTP
+## Dot HTTP Format
 
-```diff
-=== RUN   TestHTTPDump/post_json
-    httpdump.go:63: Request does not match snapshot.
-          Snapshot(-)
-          Received(+):
+Request/Response Dump:
 
-          map[string]any{
-                "email":    string("john.doe@mail.com"),
-        +       "name":     string("John Doe"),
-        -       "password": string("p@$$w0rd"),
-        +       "password": string("p@$$w0rd123"),
-          }
-```
+.code asset/snippets/httpdump.http
+
+: Has request/response line
+: Request has full url query string
+: Response has status code
+: Has request/response body
+: Has request/response headers
+
+## JSON - Diff
+
+.code asset/snippets/jsondump_diff.txt
 
 
-## Diff JSON
+## Dot HTTP - Diff
 
-```diff
-=== RUN   TestDumpJSON
-    jsondump_test.go:27:
-          Snapshot(-)
-          Received(+):
+.code asset/snippets/httpdump_diff.txt
 
-          map[string]any{
-        -       "age": float64(13),
-        +       "age": float64(18),
-                ... // 1 ignored entry
-        +       "hobbies":   []any{string("surfing")},
-                "isMarried": bool(true),
-                "name":      string("John Appleseed"),
-          }
-```
 
 ## Basic Example
 
@@ -143,6 +97,7 @@ JSON Dump:
 .code asset/snippets/httpdump_basic_test.go /^type Echo/,/\}/
 
 .code asset/snippets/httpdump_basic_test.go /^func echo/,/^\}/
+
 
 ## Echo Handler - Test
 
@@ -154,51 +109,199 @@ JSON Dump:
 
 .code asset/snippets/testdata/TestEchoHandler.http
 
+
 ## Echo Handler - Code Changes
 
 What happens if we change the message from `hello world` to `hello, go`?
 
-```diff
-func TestEchoHandler(t *testing.T) {
-    b := []byte(`{
--        "message": "hello world"
-+        "message": "hello, go"
-    }`)
-    r := httptest.NewRequest("POST", "/echo", bytes.NewReader(b))
-    ...
-}
-```
+.code asset/snippets/handler_change.txt
+
 
 ## Echo Handler - Diff Output
 
 We will see the diff:
 
-```bash
-=== RUN   TestEchoHandler
-    httpdump.go:94: Request does not match snapshot.
-          Snapshot(-)
-          Received(+):
+.code asset/snippets/handler_diff.txt
 
-          map[string]any{
-        -       "message": string("hello world"),
-        +       "message": string("hello, go"),
-          }
 
---- FAIL: TestEchoHandler (0.00s)
-FAIL
-exit status 1
-FAIL    github.com/alextanhongpin/go-slides/asset/snippets      0.414s
-```
+## Advance Example
 
-## Advanced
+## Advance Topic
 
-- how to handle non-deterministic fields
+- handler with dependencies
+- handling non-deterministic fields
   - id generation
   - timestamp
   - random number
-
-- middleware
+- testing middleware
   - injecting context
   - decorating handler
+- dumping external calls
 
-- dependencies
+## Handler with dependencies
+
+
+`LoginController`:
+
+.code asset/snippets/httpdump_advance_test.go /^type LoginController/,/\}/
+
+has a `loginUsecase` dependency:
+
+.code asset/snippets/httpdump_advance_test.go /^type loginUsecase/,/\}/
+
+
+
+##
+
+`PostLogin` method:
+
+.code asset/snippets/httpdump_advance_test.go /^func \(ctrl \*LoginController/,/^\}/
+
+
+## Mocking dependencies - Setup
+
+When unit testing layers, treat the layer below as black-box.
+
+In short, we will mock the dependencies.
+
+.code asset/snippets/httpdump_advance_test.go /^type mockLoginUsecase/,/^\}/
+
+
+We can write the mock manually, or use tools like [https://vektra.github.io/mockery/](https://vektra.github.io/mockery/).
+
+
+## Mocking dependencies - Goal
+
+We will validate the args, and stub the result and error.
+
+We also check if the method is only invoked once.
+
+.code asset/snippets/httpdump_advance_test.go /^func \(uc \*mockLoginUsecase/,/^\}/
+
+## Login Handler - Success
+
+- dump the request/response
+- validate the args for the usecase
+
+.code asset/snippets/httpdump_advance_test.go /^func TestLoginHandlerSuccess/,/^\}/
+
+## Login Handler - Output
+
+.code asset/snippets/testdata/TestLoginHandlerSuccess.http
+
+## Login Handler - Failed
+
+Use `errors.Is` to compare error. This ensures that the branch is really covered.
+
+.code asset/snippets/httpdump_advance_test.go /^func TestLoginHandlerFailed/,/^\}/
+
+
+## Login Handler - Output
+
+.code asset/snippets/testdata/TestLoginHandlerFailed.http
+
+
+## Handling non-deterministic output
+
+Non-deterministic output will break the snapshot.
+
+Examples:
+- uuid generation
+- timestamps
+- random number generator
+
+In the code, this is how it will look like:
+
+.code asset/snippets/httpdump_non_deterministic_test.go /u :=/,/}/
+
+## Handling non-determistic output - Output
+
+.code asset/snippets/testdata/TestRegisterHandler.http
+
+## Handling non-determistic output - Diff
+
+Re-running tests will lead to errors 😱:
+
+.image ./asset/snippets/non-deterministic.png _ 640
+
+
+## Dealing with non-determistic output
+
+Two options:
+
+- use a fixed value (not always viable 😩)
+- ignore the field 😈
+
+
+## Ignore the field
+
+To ignore JSON fields, use `testutil.IgnoreFields`:
+
+.code asset/snippets/httpdump_non_deterministic_test.go /func Test/,/IgnoreFields/
+
+To ignore headers, use `testutil.IgnoreHeaders` 🤗.
+
+## Inspecting response body
+
+
+Sometimes, it is necessary to still validate the fields rather than just ignoring them.
+
+We can inspect the body and do custom validation. For example, we may want to validate if the `id` returned is indeed a `uuid`:
+
+.code asset/snippets/httpdump_non_deterministic_test.go /DumpHTTP/,/\}\),/
+
+
+## Inspecting response headers
+
+We can also do the same with headers using `testutil.InspectHeaders`:
+
+.code asset/snippets/httpdump_non_deterministic_test.go /InspectHeaders/,/\}\),/
+
+## Summary
+
+## What we can achieve with snapshot testing
+
+With snapshot testing
+- we can test and document our HTTP handlers
+- we don't need to write manual assertions (except for non-deterministic value)
+- we can easily test against regression
+- we can easily visualize diffs in the request/response
+- we write less code
+
+> The less code we write, the less we will have to refactor, the less we will have to read, and the less will have to test.
+
+
+## What's next?
+
+Bringing snapshot testing to Backend:
+
+- snapshot testing for gRCP and graphql?
+- snapshot testing for SQL?
+- snapshot testing for message queue?
+
+## Useful Tips
+
+## gotest
+
+Color your test output with [https://github.com/rakyll/gotest](https://github.com/rakyll/gotest).
+
+.image ./asset/snippets/gotest.png _ 640
+
+
+However, it doesn't have highlight the `+/-` 😔.
+
+## grc - generic colouriser
+
+How to setup it [here](https://github.com/alextanhongpin/go-learn/blob/master/test-color.md#harder).
+
+.image ./asset/snippets/grc.png _ 640
+
+## httpyac
+
+
+The `.http` files are actually executable if you install the [httpYac](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac) or [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension on VS Code.
+
+
+The [httpYac](https://httpyac.github.io/) client has the advantage that it can be run as CLI.
+
+.image ./asset/snippets/httpyac.gif _ 640

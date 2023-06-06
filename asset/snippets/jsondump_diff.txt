@@ -1,0 +1,13 @@
+=== RUN   TestDumpJSON
+    jsondump_test.go:27:
+          Snapshot(-)
+          Received(+)
+
+          map[string]any{
+        -       "age": float64(13),
+        +       "age": float64(18),
+                ... // 1 ignored entry
+        +       "hobbies":   []any{string("surfing")},
+                "isMarried": bool(true),
+                "name":      string("John Appleseed"),
+          }

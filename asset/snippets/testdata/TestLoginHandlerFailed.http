@@ -1,0 +1,19 @@
+POST /login HTTP/1.1
+Host: example.com
+User-Agent: Go-http-client/1.1
+Content-Length: 70
+Accept-Encoding: gzip
+
+{
+ "email": "john.appleseed@mail.com",
+ "password": "s3cur3p@$$w0rd"
+}
+
+---
+
+HTTP/1.1 401 Unauthorized
+Connection: close
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+
+user not found

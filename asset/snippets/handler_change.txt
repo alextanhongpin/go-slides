@@ -1,0 +1,8 @@
+func TestEchoHandler(t *testing.T) {
+    b := []byte(`{
+-        "message": "hello world"
++        "message": "hello, go"
+    }`)
+    r := httptest.NewRequest("POST", "/echo", bytes.NewReader(b))
+    ...
+}

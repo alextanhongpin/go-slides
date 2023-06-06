@@ -1,0 +1,14 @@
+=== RUN   TestEchoHandler
+    httpdump.go:94: Request does not match snapshot.
+          Snapshot(-)
+          Received(+):
+
+          map[string]any{
+        -       "message": string("hello world"),
+        +       "message": string("hello, go"),
+          }
+
+--- FAIL: TestEchoHandler (0.00s)
+FAIL
+exit status 1
+FAIL    github.com/alextanhongpin/go-slides/asset/snippets      0.414s

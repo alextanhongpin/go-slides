@@ -1,0 +1,11 @@
+=== RUN   TestHTTPDump/post_json
+    httpdump.go:63: Request does not match snapshot.
+          Snapshot(-)
+          Received(+)
+
+          map[string]any{
+                "email":    string("john.doe@mail.com"),
+        +       "name":     string("John Doe"),
+        -       "password": string("p@$$w0rd"),
+        +       "password": string("p@$$w0rd123"),
+          }
