@@ -253,7 +253,7 @@ In the code, this is how it will look like:
 
 Re-running tests will lead to errors 😱:
 
-.image ./asset/snippets/non-deterministic.png _ 640
+.image asset/snippets/non-deterministic.png _ 640
 
 
 ## Dealing with non-determistic output
@@ -316,7 +316,7 @@ Bringing snapshot testing to Backend:
 
 Color your test output with [https://github.com/rakyll/gotest](https://github.com/rakyll/gotest).
 
-.image ./asset/snippets/gotest.png _ 640
+.image asset/snippets/gotest.png _ 640
 
 
 However, it doesn't have highlight the `+/-` 😔.
@@ -325,7 +325,7 @@ However, it doesn't have highlight the `+/-` 😔.
 
 How to setup it [here](https://github.com/alextanhongpin/go-learn/blob/master/test-color.md#harder).
 
-.image ./asset/snippets/grc.png _ 640
+.image asset/snippets/grc.png _ 640
 
 ## httpyac
 
@@ -335,4 +335,4 @@ The `.http` files are actually executable if you install the [httpYac](https://m
 
 The [httpYac](https://httpyac.github.io/) client has the advantage that it can be run as CLI.
 
-.image ./asset/snippets/httpyac.gif _ 640
+.image asset/snippets/httpyac.gif _ 640
