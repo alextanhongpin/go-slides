@@ -52,7 +52,7 @@ Snapshot testing is a type of testing that compares the current output of a comp
 To come up with a dump format, we need to fulfil the following criteria
 
 - human-readable
-- can be easily compared
+- diff-friendly
 
 
 Proposed format:
