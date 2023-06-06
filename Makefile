@@ -1,4 +1,5 @@
 gen:
+	@mkdir -p docs
 	@go-present -in main.slide -out ./docs/index.html
 
 
