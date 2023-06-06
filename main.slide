@@ -90,6 +90,37 @@ Request/Response Dump:
 .code asset/snippets/httpdump_diff.txt
 
 
+## net/http/httputil
+
+
+Go has a standard package `net/http/httputil` that can dump the request/response:
+
+.code asset/snippets/httptest.go /import/,/^}/
+
+## Snapshot Testing Package
+
+However, the standard package does not pretty print the request/response.
+
+Also, just dumping the request/response as string does not make it comparable.
+
+Some customization is required to improve the developer experience.
+
+Installation:
+
+```bash
+$ go get github.com/alextanhongpin/core
+```
+
+
+Usage:
+
+```go
+import "github.com/alextanhongpin/core/test/testutil"
+
+testutil.DumpHTTP(t, req, handler)
+testutil.DumpJSON(t, struct)
+```
+
 ## Basic Example
 
 ## Echo Handler
