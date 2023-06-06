@@ -3,7 +3,7 @@ gen:
 
 
 install:
-	@go install github.com/alextanhongpin/go-present
+	@go install github.com/alextanhongpin/go-present@latest
 
 
 present:
