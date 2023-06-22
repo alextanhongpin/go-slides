@@ -46,7 +46,6 @@ Snapshot testing is a type of testing that compares the current output of a comp
 
 ## Dump Format
 
-
 To come up with a dump format, we need to fulfil the following criteria
 
 - human-readable
